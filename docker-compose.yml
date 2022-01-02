@@ -1,0 +1,9 @@
+version: '3.3'
+
+services:
+
+  accounting:
+    image: python:3-alpine
+    volumes:
+      - ./:/app
+    command: python /app/account.py
