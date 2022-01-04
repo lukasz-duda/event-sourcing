@@ -7,4 +7,4 @@ RUN pip install --requirement requirements.txt
 
 COPY *.py /app/
 
-CMD [ "pytest", "account_test.py" ]
+CMD [ "python", "-m", "unittest", "discover", "-p", "*_test.py" ]

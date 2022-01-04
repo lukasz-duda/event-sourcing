@@ -1,3 +1,6 @@
-class TestAccount:
+import unittest
+
+class TestAccount(unittest.TestCase):
+
     def test_one(self):
-        assert 1 == 1
+        self.assertTrue(True)
