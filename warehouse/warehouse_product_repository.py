@@ -1,0 +1,3 @@
+class WarehouseProductRepository:
+    
+    streams = []
