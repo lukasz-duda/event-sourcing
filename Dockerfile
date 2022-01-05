@@ -1,11 +1,11 @@
 FROM python:3-alpine
 
-WORKDIR /warehouse
-COPY requirements.txt /warehouse/
+WORKDIR /app
+COPY requirements.txt /app/
 
 RUN pip install --upgrade pip
 RUN pip install --requirement requirements.txt
 
-COPY warehouse/*.py /warehouse/
+COPY ./warehouse/*.py /app/warehouse/
 
-CMD [ "python", "-m", "unittest", "discover", "-p", "*_test.py" ]
+CMD [ "python", "-m", "unittest", "discover", "-s", "./warehouse", "-p", "*_test.py" ]
