@@ -1,3 +1,3 @@
 class WarehouseProductRepository:
     
-    streams = []
+    _streams = []

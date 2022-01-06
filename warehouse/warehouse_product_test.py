@@ -45,9 +45,9 @@ class WarehouseProductTest(unittest.TestCase):
     def test_receive_rises_event(self):
         self.product.receive(1)
 
-        self.assertEquals(1, len(self.product.uncommitted_events))
+        self.assertEqual(1, len(self.product.uncommitted_events))
         event = self.product.uncommitted_events[0]
-        self.assertEquals('ProductReceived', event.event_type)
-        self.assertEquals(self.product.sku, event.sku)
+        self.assertEqual('ProductReceived', event.event_type)
+        self.assertEqual(self.product.sku, event.sku)
         self.assertIsNotNone(event.timestamp)
-        self.assertEquals(1, event.quantity)
+        self.assertEqual(1, event.quantity)
