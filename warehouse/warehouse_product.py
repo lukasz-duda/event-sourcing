@@ -7,18 +7,18 @@ class WarehouseProduct:
     
     def __init__(self, sku: str) -> None:
         self.sku = sku
-        self.quantity = 0
+        self.quantityOnHand = 0
 
     def receive(self, quantity: int) -> None:
-        self.quantity += quantity
+        self.quantityOnHand += quantity
 
     def adjust_inventory(self, quantity: int, reason: str) -> None:
-        self.quantity += quantity
+        self.quantityOnHand += quantity
 
     def ship(self, quantity: int) -> Result:
-        if(self.quantity < quantity):
-            return Result.fail('Not enough quantity')
+        if(self.quantityOnHand < quantity):
+            return Result.fail('Not enough quantity on hand')
 
-        self.quantity -= quantity
+        self.quantityOnHand -= quantity
 
         return Result.ok()
