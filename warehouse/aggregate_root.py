@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import List
 from warehouse.event import Event
 
@@ -9,8 +10,17 @@ class AggregateRoot:
     def __init__(self) -> None:
         self._events = []
         self._uncommitted_events = []
+    
+    def load(self, events: List[Event]) -> None:
+        for e in events:
+            self._events.append(e)
+            self._apply(e)
+    
+    @abstractmethod
+    def _apply(self, event: Event) -> None:
+        pass
 
-    def add_event(self, event: Event):
+    def _add_event(self, event: Event):
         self._uncommitted_events.append(event)
     
     @property

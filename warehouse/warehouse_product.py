@@ -1,7 +1,9 @@
 from datetime import datetime
 from warehouse.aggregate_root import AggregateRoot
 from warehouse.event import Event
+from warehouse.inventory_adjusted import InventoryAdjusted
 from warehouse.product_received import ProductReceived
+from warehouse.product_shipped import ProductShipped
 from warehouse.result import Result
 
 class WarehouseProduct(AggregateRoot):
@@ -23,24 +25,27 @@ class WarehouseProduct(AggregateRoot):
         return self._quantityOnHand
 
     def receive(self, quantity: int) -> None:
-        product_received = ProductReceived(self.sku, quantity, datetime.utcnow())
-        self.add_event(product_received)
-        self.apply(product_received)
+        product_received = ProductReceived(self._sku, quantity, datetime.utcnow())
+        self._add_event(product_received)
+        self._apply(product_received)
 
-    def apply(self, event: Event):
-        if(event._event_type in ['ProductReceived']):
-            self.__increase_quantity(event.quantity)
-
-    def __increase_quantity(self, quantity: int):
-        self._quantityOnHand += quantity
+    def _apply(self, event: Event):
+        if(event._event_type in ['ProductReceived', 'InventoryAdjusted']):
+            self._quantityOnHand += event.quantity
+        if(event._event_type == 'ProductShipped'):
+            self._quantityOnHand -= event.quantity
 
     def adjust_inventory(self, quantity: int, reason: str) -> None:
-        self._quantityOnHand += quantity
+        inventory_adjusted = InventoryAdjusted(self._sku, quantity, reason, datetime.utcnow())
+        self._add_event(inventory_adjusted)
+        self._apply(inventory_adjusted)
 
     def ship(self, quantity: int) -> Result:
         if(self._quantityOnHand < quantity):
             return Result.fail('Not enough quantity on hand')
 
-        self._quantityOnHand -= quantity
+        product_shipped = ProductShipped(self._sku, quantity, datetime.utcnow())
+        self._add_event(product_shipped)
+        self._apply(product_shipped)
 
         return Result.ok()
