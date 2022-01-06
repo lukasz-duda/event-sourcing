@@ -42,4 +42,9 @@ class WarehouseProductTest(unittest.TestCase):
 
         self.assertFalse(result.success)
 
-        
+    def test_receive_rises_event(self):
+        self.product.receive(1)
+
+        self.assertEquals(1, len(self.product.uncommitted_events))
+        event = self.product.uncommitted_events[0]
+        self.assertEquals(1, event.quantity)
