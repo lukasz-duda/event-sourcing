@@ -29,9 +29,20 @@ class WarehouseProduct(AggregateRoot):
         self._add_event(product_received)
 
     def _apply(self, event: Event):
-        if(event._event_type in ['ProductReceived', 'InventoryAdjusted']):
+        if(event.event_type == 'ProductReceived'):
+            self.__apply_product_received(event)
+        if(event.event_type ==  'InventoryAdjusted'):
+            self.__apply_inventory_adjusted(event)
+        if(event.event_type == 'ProductShipped'):
+            self.__apply_product_shipped(event)
+
+    def __apply_product_received(self, event: Event):
             self._quantityOnHand += event.quantity
-        if(event._event_type == 'ProductShipped'):
+
+    def __apply_inventory_adjusted(self, event: Event):
+            self._quantityOnHand += event.quantity
+
+    def __apply_product_shipped(self, event: Event):
             self._quantityOnHand -= event.quantity
 
     def adjust_inventory(self, quantity: int, reason: str) -> None:
