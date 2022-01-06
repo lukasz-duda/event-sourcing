@@ -7,6 +7,6 @@ class ProductReceived(Event):
     quantity: int
 
     def __init__(self, sku: str, quantity: int, timestamp: datetime) -> None:
-        super().__init__(timestamp)
+        super().__init__('ProductReceived', timestamp)
         self.sku = sku
         self.quantity = quantity

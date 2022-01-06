@@ -47,4 +47,7 @@ class WarehouseProductTest(unittest.TestCase):
 
         self.assertEquals(1, len(self.product.uncommitted_events))
         event = self.product.uncommitted_events[0]
+        self.assertEquals('ProductReceived', event.event_type)
+        self.assertEquals(self.product.sku, event.sku)
+        self.assertIsNotNone(event.timestamp)
         self.assertEquals(1, event.quantity)
