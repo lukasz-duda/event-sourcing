@@ -22,6 +22,7 @@ class AggregateRoot:
 
     def _add_event(self, event: Event):
         self._uncommitted_events.append(event)
+        self._apply(event)
     
     @property
     def uncommitted_events(self) -> List[Event]:

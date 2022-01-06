@@ -27,7 +27,6 @@ class WarehouseProduct(AggregateRoot):
     def receive(self, quantity: int) -> None:
         product_received = ProductReceived(self._sku, quantity, datetime.utcnow())
         self._add_event(product_received)
-        self._apply(product_received)
 
     def _apply(self, event: Event):
         if(event._event_type in ['ProductReceived', 'InventoryAdjusted']):
@@ -38,7 +37,6 @@ class WarehouseProduct(AggregateRoot):
     def adjust_inventory(self, quantity: int, reason: str) -> None:
         inventory_adjusted = InventoryAdjusted(self._sku, quantity, reason, datetime.utcnow())
         self._add_event(inventory_adjusted)
-        self._apply(inventory_adjusted)
 
     def ship(self, quantity: int) -> Result:
         if(self._quantityOnHand < quantity):
@@ -46,6 +44,5 @@ class WarehouseProduct(AggregateRoot):
 
         product_shipped = ProductShipped(self._sku, quantity, datetime.utcnow())
         self._add_event(product_shipped)
-        self._apply(product_shipped)
 
         return Result.ok()
