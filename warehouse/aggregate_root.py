@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractclassmethod
 from typing import List
 from warehouse.event import Event
 
@@ -16,7 +16,7 @@ class AggregateRoot:
             self._events.append(e)
             self._apply(e)
     
-    @abstractmethod
+    @abstractclassmethod
     def _apply(self, event: Event) -> None:
         pass
 
