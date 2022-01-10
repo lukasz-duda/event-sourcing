@@ -1,0 +1,6 @@
+POST /products/receive HTTP/1.0
+Host: localhost:5000
+Content-Type: application/json
+Content-Length: 26
+
+{"sku":"abc","quantity":5}
