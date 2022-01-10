@@ -1,12 +1,12 @@
 from datetime import datetime
 from warehouse.aggregate_root import AggregateRoot
-from warehouse.event import Event
-from warehouse.inventory_adjusted import InventoryAdjusted
-from warehouse.product_received import ProductReceived
-from warehouse.product_shipped import ProductShipped
+from warehouse.events.event import Event
+from warehouse.events.inventory_adjusted import InventoryAdjusted
+from warehouse.events.product_received import ProductReceived
+from warehouse.events.product_shipped import ProductShipped
 from warehouse.result import Result
 
-class WarehouseProduct(AggregateRoot):
+class Product(AggregateRoot):
 
     _sku: str
     _quantityOnHand: int

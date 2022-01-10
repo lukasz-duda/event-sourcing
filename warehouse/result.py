@@ -1,25 +1,25 @@
 class Result:
 
-    _success: bool
-    _error: str
-    _value: any
+    __success: bool
+    __error: str
+    __value: any
 
     def __init__(self, success: bool, error: str = None, value: any = None) -> None:
-        self._success = success
-        self._error = error if not success else None
-        self._value = value if success else None
+        self.__success = success
+        self.__error = error if not success else None
+        self.__value = value if success else None
 
     @property
     def success(self) -> bool:
-        return self._success
+        return self.__success
     
     @property
     def error(self) -> str:
-        return self.error
+        return self.__error
     
     @property
     def value(self) -> any:
-        return self._value
+        return self.__value
 
     def fail(error: str) -> 'Result':
         return Result(False, error)

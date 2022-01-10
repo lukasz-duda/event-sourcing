@@ -1,13 +1,12 @@
 from datetime import datetime
 import unittest
-from warehouse.product_received import ProductReceived
+from warehouse.events.product_received import ProductReceived
+from warehouse.product import Product
 
-from warehouse.warehouse_product import WarehouseProduct
-
-class WarehouseProductTest(unittest.TestCase):
+class ProductTest(unittest.TestCase):
 
     def setUp(self):
-        self.product = WarehouseProduct('a')
+        self.product = Product('a')
     
     def test_receive_increases_quantity(self):
         self.product.receive(1)

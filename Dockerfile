@@ -5,11 +5,9 @@ RUN python -m venv /opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app
-COPY requirements.txt /app/
+COPY requirements.txt .
 
 RUN pip install --upgrade pip
 RUN pip install --requirement requirements.txt
 
-COPY ./.flaskenv /app/
-COPY ./app.py /app/
-COPY ./warehouse/*.py /app/warehouse/
+COPY . .

@@ -1,5 +1,5 @@
 from datetime import datetime
-from warehouse.event import Event
+from warehouse.events.event import Event
 
 class InventoryAdjusted(Event):
 

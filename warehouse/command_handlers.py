@@ -1,12 +1,12 @@
-from warehouse.commands import ReceiveProductCommand
-from warehouse.warehouse_product_repository import WarehouseProductRepository
+from warehouse.commands.receive_product_command import ReceiveProductCommand
+from warehouse.product_repository import ProductRepository
 
-class WarehouseCommandHandlers:
+class CommandHandlers:
 
-    __repository: WarehouseProductRepository
+    __repository: ProductRepository
 
-    def __init__(self) -> None:
-        self.__repository = WarehouseProductRepository()
+    def __init__(self, repository: ProductRepository) -> None:
+        self.__repository = repository
 
     def handle_receive_product(self, command: ReceiveProductCommand):
         product = self.__repository.get(command.sku)
