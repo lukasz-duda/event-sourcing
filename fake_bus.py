@@ -1,42 +1,29 @@
-from typing import List
+from typing import Callable, Dict, List, Type
 from bus import Bus
-
-class CommandHandler:
-
-    __command: type
-    __handler: callable
-
-    def __init__(self, command: type, handler: callable) -> None:
-        self.__command = command
-        self.__handler = handler
-
-    @property
-    def command(self):
-        return self.__command
-
-    @property
-    def handler(self):
-        return self.__handler
 
 class FakeBus(Bus):
 
-    __command_handlers: List[CommandHandler]
+    __routes: Dict[Type, List[Callable]]
 
     def __init__(self) -> None:
         super().__init__()
-        self.__command_handlers = []
+        self.__routes = dict()
     
-    def register_handler(self, command: type, handler: callable):
-        command_handler = CommandHandler(command, handler)
-        self.__command_handlers.append(command_handler)
+    def register_handler(self, command_type: Type, handler: Callable):
+        if command_type in self.__routes:
+            handlers = self.__routes[command_type]
+            handlers.append(handler)
+        else:
+            self.__routes[command_type] = [handler]
     
     def send(self, command: any):
-        matching = [x for x in self.__command_handlers if x.command == type(command)]
-
-        if(len(matching) == 0):
+        command_type = type(command)
+        
+        if command_type not in self.__routes:
             raise Exception('No handler registered.')
 
-        if(len(matching) > 1):
+        handlers = self.__routes[command_type]
+        if(len(handlers) > 1):
             raise Exception('Cannot send to more than one handler.')
         
-        matching[0].handler(command)
+        handlers[0](command)
