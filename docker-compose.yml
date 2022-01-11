@@ -2,10 +2,6 @@ version: '3.3'
 
 services:
 
-  test:
-    build: .
-    command: python -m unittest discover -s ./warehouse -p *_test.py
-
   dev:
     build: .
     ports:
@@ -13,3 +9,10 @@ services:
     command: python -m flask run
     volumes:
       - ./:/app/
+
+  test:
+    network_mode: "host"
+    build: .
+    command: python -m unittest discover -s ./warehouse -p *_test.py
+    depends_on:
+      - dev

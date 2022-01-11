@@ -1,1 +1,0 @@
-netcat localhost 5000 < request.txt
