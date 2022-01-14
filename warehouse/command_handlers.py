@@ -11,3 +11,4 @@ class CommandHandlers:
     def handle_receive_product(self, command: ReceiveProductCommand):
         product = self.__repository.get(command.sku)
         product.receive(command.quantity)
+        self.__repository.save(product)

@@ -11,3 +11,5 @@ class CommandTest(unittest.TestCase):
         response = requests.post('http://localhost:5000/products/receive', data=request_data, headers=headers)
 
         self.assertEqual(200, response.status_code)
+        response_data = json.loads(response.text)
+        self.assertEqual(5, response_data['quantity'])

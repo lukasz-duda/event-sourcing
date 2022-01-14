@@ -1,3 +1,4 @@
+from asyncio import events
 from typing import Callable, Dict, List, Type
 from bus import Bus
 
@@ -9,21 +10,30 @@ class FakeBus(Bus):
         super().__init__()
         self.__routes = dict()
     
-    def register_handler(self, command_type: Type, handler: Callable):
-        if command_type in self.__routes:
-            handlers = self.__routes[command_type]
+    def register_handler(self, message_type: Type, handler: Callable):
+        if message_type in self.__routes:
+            handlers = self.__routes[message_type]
             handlers.append(handler)
         else:
-            self.__routes[command_type] = [handler]
+            self.__routes[message_type] = [handler]
     
     def send(self, command: any):
-        command_type = type(command)
+        message_type = type(command)
         
-        if command_type not in self.__routes:
+        if message_type not in self.__routes:
             raise Exception('No handler registered.')
 
-        handlers = self.__routes[command_type]
+        handlers = self.__routes[message_type]
         if(len(handlers) > 1):
             raise Exception('Cannot send to more than one handler.')
         
         handlers[0](command)
+    
+    def publish(self, event: any):
+        message_type = type(event)
+        
+        if message_type not in self.__routes:
+            return
+
+        for handler in self.__routes[message_type]:
+            handler(event)
