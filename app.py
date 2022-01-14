@@ -22,10 +22,9 @@ details = InventoryItemDetailsView(database)
 bus.register_handler(ProductReceived, details.handle_product_received)
 ServiceLocator.bus = bus
 
-@app.route('/products/receive', methods=['POST'])
-def receive_product():
+@app.route('/products/<sku>/receive', methods=['POST'])
+def receive_product(sku: str):
     json = request.get_json()
-    sku = json['sku']
     quantity = json['quantity']
     command = ReceiveProductCommand(sku, quantity)
     ServiceLocator.bus.send(command)
