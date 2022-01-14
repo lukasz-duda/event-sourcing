@@ -46,8 +46,8 @@ class ProductTest(unittest.TestCase):
     def test_receive_rises_event(self):
         self.product.receive(5)
 
-        self.assertEqual(1, len(self.product.uncommitted_events))
-        event = self.product.uncommitted_events[0]
+        self.assertEqual(1, len(self.product.changes))
+        event = self.product.changes[0]
         self.assertEqual('ProductReceived', event.event_type)
         self.assertEqual(self.product.sku, event.sku)
         self.assertIsNotNone(event.timestamp)
@@ -56,8 +56,8 @@ class ProductTest(unittest.TestCase):
     def test_adjust_inventory_rises_event(self):
         self.product.adjust_inventory(6, 'magically found')
 
-        self.assertEqual(1, len(self.product.uncommitted_events))
-        event = self.product.uncommitted_events[0]
+        self.assertEqual(1, len(self.product.changes))
+        event = self.product.changes[0]
         self.assertEqual('InventoryAdjusted', event.event_type)
         self.assertEqual(self.product.sku, event.sku)
         self.assertIsNotNone(event.timestamp)
@@ -68,8 +68,8 @@ class ProductTest(unittest.TestCase):
         self.product.load([ProductReceived('a', 7, datetime.utcnow())])
         self.product.ship(7)
 
-        self.assertEqual(1, len(self.product.uncommitted_events))
-        event = self.product.uncommitted_events[0]
+        self.assertEqual(1, len(self.product.changes))
+        event = self.product.changes[0]
         self.assertEqual('ProductShipped', event.event_type)
         self.assertEqual(self.product.sku, event.sku)
         self.assertIsNotNone(event.timestamp)
@@ -79,4 +79,4 @@ class ProductTest(unittest.TestCase):
         self.product.load([ProductReceived('a', 6, datetime.utcnow())])
         self.product.ship(7)
 
-        self.assertEqual(0, len(self.product.uncommitted_events))
+        self.assertEqual(0, len(self.product.changes))

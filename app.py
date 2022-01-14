@@ -1,21 +1,26 @@
 from flask import Flask, request, jsonify
 from flask.helpers import make_response
+from fake_bus import FakeBus
 from service_locator import ServiceLocator
 from warehouse.command_handlers import CommandHandlers
 from warehouse.commands.receive_product_command import ReceiveProductCommand
+from warehouse.event_store import EventStore
 from warehouse.events.product_received import ProductReceived
 from warehouse.product_repository import ProductRepository
 from warehouse.read_model import FakeDatabase, InventoryItemDetailsDto, InventoryItemDetailsView
 
 app = Flask(__name__)
 
+bus = FakeBus()
 database = FakeDatabase()
 database.save_details(InventoryItemDetailsDto('abc', 0))
-repository = ProductRepository()
+storage = EventStore(bus)
+repository = ProductRepository(storage)
 commands = CommandHandlers(repository)
-ServiceLocator.bus.register_handler(ReceiveProductCommand, commands.handle_receive_product)
+bus.register_handler(ReceiveProductCommand, commands.handle_receive_product)
 details = InventoryItemDetailsView(database)
-ServiceLocator.bus.register_handler(ProductReceived, details.handle_product_received)
+bus.register_handler(ProductReceived, details.handle_product_received)
+ServiceLocator.bus = bus
 
 @app.route('/products/receive', methods=['POST'])
 def receive_product():

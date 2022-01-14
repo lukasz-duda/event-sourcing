@@ -1,7 +1,12 @@
 from abc import abstractclassmethod
 
+class EventPublisher:
 
-class Bus:
+    @abstractclassmethod
+    def publish(self, event):
+        pass
+
+class Bus(EventPublisher):
 
     @abstractclassmethod
     def register_handler(self, action):
@@ -9,8 +14,4 @@ class Bus:
 
     @abstractclassmethod
     def send(self, command):
-        pass
-
-    @abstractclassmethod
-    def publish(self, event):
         pass

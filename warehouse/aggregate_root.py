@@ -4,16 +4,13 @@ from warehouse.events.event import Event
 
 class AggregateRoot:
 
-    _events : List[Event]
-    _uncommitted_events : List[Event]
+    __changes : List[Event]
 
     def __init__(self) -> None:
-        self._events = []
-        self._uncommitted_events = []
+        self.__changes = []
     
     def load(self, events: List[Event]) -> None:
         for e in events:
-            self._events.append(e)
             self._apply(e)
     
     @abstractclassmethod
@@ -21,9 +18,9 @@ class AggregateRoot:
         pass
 
     def _add_event(self, event: Event):
-        self._uncommitted_events.append(event)
+        self.__changes.append(event)
         self._apply(event)
     
     @property
-    def uncommitted_events(self) -> List[Event]:
-        return self._uncommitted_events
+    def changes(self) -> List[Event]:
+        return self.__changes
