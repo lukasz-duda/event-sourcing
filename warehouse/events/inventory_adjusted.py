@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from warehouse.events.event import Event
 
 class InventoryAdjusted(Event):
@@ -24,3 +25,13 @@ class InventoryAdjusted(Event):
     @property
     def reason(self) -> str:
         return self._reason
+    
+    def to_json(self) -> str:
+        return json.dumps({
+            "eventId": str(self.id),
+            "eventType": self.event_type,
+            "data": {
+                "quantity": self.quantity,
+                "reason": self.reason
+            }
+        })

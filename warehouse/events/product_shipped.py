@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from warehouse.events.event import Event
 
 class ProductShipped(Event):
@@ -18,3 +19,12 @@ class ProductShipped(Event):
     @property
     def quantity(self) -> int:
         return self._quantity
+    
+    def to_json(self) -> str:
+        return json.dumps({
+            "eventId": str(self.id),
+            "eventType": self.event_type,
+            "data": {
+                "quantity": self.quantity
+            }
+        })

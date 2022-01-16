@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask.helpers import make_response
 from fake_bus import FakeBus
 from service_locator import ServiceLocator
 from warehouse.command_handlers import CommandHandlers
