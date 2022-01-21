@@ -12,4 +12,4 @@ class CommandTest(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         response_data = json.loads(response.text)
-        self.assertEqual(5, response_data['quantity'])
+        self.assertEqual(5, response_data['currentQuantity'])
