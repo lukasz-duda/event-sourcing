@@ -18,7 +18,6 @@ class EventStoreTest(TestCase):
     def sut(self):
         return self.__sut
 
-    @unittest.skip('not implemented yet')
     def test_saves_event(self):
         event1 = ProductReceived('test_aggregate', 3, datetime.utcnow())
         event2 = ProductShipped('test_aggregate', 2, datetime.utcnow())

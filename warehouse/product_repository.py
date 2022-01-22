@@ -18,7 +18,7 @@ class ProductRepository:
         self.__storage.save_events(product.sku, product.changes)
 
     def get(self, sku: str) -> Product:
-        if sku in self.__products:
-            return self.__products[sku]
-        else:
-            return Product(sku)
+        events = self.__storage.get_events_for_aggregate(sku)
+        product = Product(sku)
+        product.load(events)
+        return product
