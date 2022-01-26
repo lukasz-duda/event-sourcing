@@ -1,5 +1,4 @@
 from typing import Dict
-from service_locator import ServiceLocator
 from warehouse.event_store import EventStore
 from warehouse.product import Product
 
@@ -13,7 +12,7 @@ class ProductRepository:
         self.__products = dict()
         self.__storage = storage
 
-    def save(self, product: Product):
+    def save(self, product: Product) -> None:
         self.__products[product.sku] = product
         self.__storage.save_events(product.sku, product.changes)
 

@@ -1,6 +1,6 @@
 from typing import Dict
-
 from warehouse.events.product_received import ProductReceived
+from warehouse.not_found_exception import NotFoundException
 
 class InventoryItemDetailsDto:
 
@@ -14,7 +14,7 @@ class InventoryItemDetailsDto:
     @property
     def sku(self):
         return self.__sku
-    
+
     @property
     def current_quantity(self):
         return self.__current_quantity
@@ -30,7 +30,10 @@ class FakeDatabase:
         self.__details[details.sku] = details
 
     def get_details(self, sku: str) -> InventoryItemDetailsDto:
-        return self.__details[sku]
+        if sku in self.__details:
+            return self.__details[sku]
+        else:
+            raise NotFoundException
         
 class InventoryItemDetailsView:
 
@@ -39,13 +42,10 @@ class InventoryItemDetailsView:
     def __init__(self, database: FakeDatabase) -> None:
         self.__database = database
 
-    def handle_product_received(self, message: ProductReceived):
+    def handle_product_received(self, message: ProductReceived) -> None:
         details = self.__database.get_details(message.sku)
         newDetails = InventoryItemDetailsDto(message.sku, details.current_quantity + message.quantity)
         self.__database.save_details(newDetails)
-    
-    def get_details_item(self, sku: str) -> InventoryItemDetailsDto:
-        return self.__database.get_details(sku);
 
 class ReadModelFacade:
 

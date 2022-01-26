@@ -1,4 +1,3 @@
-from asyncio import events
 from typing import Callable, Dict, List, Type
 from bus import Bus
 
@@ -17,7 +16,7 @@ class FakeBus(Bus):
         else:
             self.__routes[message_type] = [handler]
     
-    def send(self, command: any):
+    def send(self, command: any) -> None:
         message_type = type(command)
         
         if message_type not in self.__routes:
@@ -29,7 +28,7 @@ class FakeBus(Bus):
         
         handlers[0](command)
     
-    def publish(self, event: any):
+    def publish(self, event: any) -> None:
         message_type = type(event)
         
         if message_type not in self.__routes:

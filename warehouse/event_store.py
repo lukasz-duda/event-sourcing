@@ -1,6 +1,7 @@
 from typing import Dict, List
 from bus import EventPublisher
 from warehouse.events.event import Event
+from warehouse.not_found_exception import NotFoundException
 
 class EventStore:
 
@@ -22,8 +23,8 @@ class EventStore:
         for event in events:
             self.__publisher.publish(event)
     
-    def get_events_for_aggregate(self, aggregate_id: str):
+    def get_events_for_aggregate(self, aggregate_id: str) -> List[Event]:
         if aggregate_id in self.__streams:
             return self.__streams[aggregate_id]
         else:
-            return []
+            raise NotFoundException
