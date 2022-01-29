@@ -1,4 +1,4 @@
-from bus import Bus
+from shared.bus import Bus
 
 class ServiceLocator:
 

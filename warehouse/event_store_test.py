@@ -1,10 +1,9 @@
+from shared.fake_bus import FakeBus
+from shared.event_store import EventStore
+from events import ProductReceived
+from events import ProductShipped
 from datetime import datetime
 from unittest import TestCase
-import unittest
-from fake_bus import FakeBus
-from warehouse.event_store import EventStore
-from warehouse.events.product_received import ProductReceived
-from warehouse.events.product_shipped import ProductShipped
 
 class EventStoreTest(TestCase):
 

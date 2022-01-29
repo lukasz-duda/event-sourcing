@@ -1,5 +1,3 @@
-from fake_bus import FakeBus
-from service_locator import ServiceLocator
 from warehouse.api import register_warehouse
 from flask import Flask
 from flask_restful import Api

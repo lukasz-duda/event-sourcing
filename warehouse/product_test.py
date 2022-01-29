@@ -1,8 +1,7 @@
-from datetime import datetime
-from typing import final
-import unittest
-from warehouse.events.product_received import ProductReceived
+from events import ProductReceived
 from warehouse.product import Product
+from datetime import datetime
+import unittest
 
 class ProductTest(unittest.TestCase):
 

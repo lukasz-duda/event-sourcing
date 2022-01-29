@@ -1,8 +1,7 @@
 import requests
 from typing import List
-from bus import EventPublisher
-from warehouse.events.event import Event
-
+from shared.bus import EventPublisher
+from warehouse.events import Event
 
 class EventStoreDB:
 

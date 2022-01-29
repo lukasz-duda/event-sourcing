@@ -1,5 +1,5 @@
 from typing import Dict
-from warehouse.event_store import EventStore
+from shared.event_store import EventStore
 from warehouse.product import Product
 
 class ProductRepository:

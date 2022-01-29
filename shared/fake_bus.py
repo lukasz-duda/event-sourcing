@@ -1,5 +1,5 @@
 from typing import Callable, Dict, List, Type
-from bus import Bus
+from shared.bus import Bus
 
 class FakeBus(Bus):
 

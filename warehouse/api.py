@@ -1,15 +1,14 @@
 from datetime import datetime
-from fake_bus import FakeBus
-from service_locator import ServiceLocator
+from shared.fake_bus import FakeBus
+from shared.service_locator import ServiceLocator
 from warehouse.command_handlers import CommandHandlers
-from warehouse.commands.receive_product_command import ReceiveProductCommand
-from warehouse.event_store import EventStore
-from warehouse.events.product_received import ProductReceived
-from warehouse.not_found_exception import NotFoundException
+from warehouse.commands import ReceiveProductCommand
+from shared.event_store import EventStore
+from warehouse.events import ProductReceived
+from shared.not_found_exception import NotFoundException
 from warehouse.product_repository import ProductRepository
 from warehouse.read_model import FakeDatabase, InventoryItemDetailsDto, InventoryItemDetailsView, ReadModelFacade
-from warehouse.commands.receive_product_command import ReceiveProductCommand
-from service_locator import ServiceLocator
+from warehouse.commands import ReceiveProductCommand
 from marshmallow import Schema, fields
 from flask_restful import Api, Resource, abort
 from flask_apispec.views import MethodResource

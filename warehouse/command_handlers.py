@@ -1,4 +1,4 @@
-from warehouse.commands.receive_product_command import ReceiveProductCommand
+from warehouse.commands import ReceiveProductCommand
 from warehouse.product_repository import ProductRepository
 
 class CommandHandlers:

@@ -1,7 +1,7 @@
 from typing import Dict, List
-from bus import EventPublisher
-from warehouse.events.event import Event
-from warehouse.not_found_exception import NotFoundException
+from shared.bus import EventPublisher
+from warehouse.events import Event
+from shared.not_found_exception import NotFoundException
 
 class EventStore:
 

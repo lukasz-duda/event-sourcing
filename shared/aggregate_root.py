@@ -1,6 +1,6 @@
 from abc import abstractclassmethod
 from typing import List
-from warehouse.events.event import Event
+from warehouse.events import Event
 
 class AggregateRoot:
 

@@ -1,9 +1,7 @@
 from datetime import datetime
-from warehouse.aggregate_root import AggregateRoot
-from warehouse.events.event import Event
-from warehouse.events.inventory_adjusted import InventoryAdjusted
-from warehouse.events.product_received import ProductReceived
-from warehouse.events.product_shipped import ProductShipped
+from shared.aggregate_root import AggregateRoot
+from shared.event import Event
+from warehouse.events import InventoryAdjusted, ProductReceived, ProductShipped
 
 class Product(AggregateRoot):
 

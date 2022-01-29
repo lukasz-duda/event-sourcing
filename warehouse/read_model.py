@@ -1,6 +1,6 @@
 from typing import Dict
-from warehouse.events.product_received import ProductReceived
-from warehouse.not_found_exception import NotFoundException
+from warehouse.events import ProductReceived
+from shared.not_found_exception import NotFoundException
 
 class InventoryItemDetailsDto:
 
