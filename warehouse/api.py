@@ -50,6 +50,14 @@ class ProductResource(MethodResource, Resource):
         except NotFoundException:
             abort(404)
 
+    @doc(description='Get product', tags=['Product'])
+    @marshal_with(ProductResponseSchema)
+    def get(self, sku: str):
+        try:
+            return ServiceLocator.read_model.get_inventory_item_details(sku)
+        except NotFoundException:
+            abort(404)
+
 class ReceiveProductRequestSchema(Schema):
     quantity = fields.Integer(required=True, description="Received quantity")
 
