@@ -18,6 +18,6 @@ class ProductRepository:
 
     def get(self, sku: str) -> Product:
         events = self.__storage.get_events_for_aggregate(sku)
-        product = Product(sku)
+        product = Product()
         product.load(events)
         return product

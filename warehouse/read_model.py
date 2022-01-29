@@ -1,5 +1,5 @@
 from typing import Dict
-from warehouse.events import ProductReceived
+from warehouse.events import ProductReceived, ProductRegistered
 from shared.not_found_exception import NotFoundException
 
 class InventoryItemDetailsDto:
@@ -42,10 +42,14 @@ class InventoryItemDetailsView:
     def __init__(self, database: FakeDatabase) -> None:
         self.__database = database
 
+    def handle_product_registered(self, message: ProductRegistered) -> None:
+        new_inventory_item = InventoryItemDetailsDto(sku=message.sku, current_quantity=0)
+        self.__database.save_details(new_inventory_item)
+
     def handle_product_received(self, message: ProductReceived) -> None:
         details = self.__database.get_details(message.sku)
-        newDetails = InventoryItemDetailsDto(message.sku, details.current_quantity + message.quantity)
-        self.__database.save_details(newDetails)
+        inventory_item = InventoryItemDetailsDto(message.sku, details.current_quantity + message.quantity)
+        self.__database.save_details(inventory_item)
 
 class ReadModelFacade:
 

@@ -1,4 +1,5 @@
-from warehouse.commands import ReceiveProductCommand
+from warehouse.commands import ReceiveProductCommand, RegisterProductCommand
+from warehouse.product import Product
 from warehouse.product_repository import ProductRepository
 
 class CommandHandlers:
@@ -7,6 +8,11 @@ class CommandHandlers:
 
     def __init__(self, repository: ProductRepository) -> None:
         self.__repository = repository
+
+    def handle_register_product(self, command: RegisterProductCommand) -> None:
+        newProduct = Product()
+        newProduct.register(command.sku)
+        self.__repository.save(newProduct)
 
     def handle_receive_product(self, command: ReceiveProductCommand) -> None:
         product = self.__repository.get(command.sku)

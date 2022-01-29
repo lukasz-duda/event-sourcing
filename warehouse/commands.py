@@ -1,3 +1,14 @@
+class RegisterProductCommand:
+
+    __sku: str
+
+    def __init__(self, sku: str) -> None:
+        self.__sku = sku
+
+    @property
+    def sku(self):
+        return self.__sku;
+
 class ReceiveProductCommand:
 
     __sku: str

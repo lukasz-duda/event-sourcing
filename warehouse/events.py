@@ -2,6 +2,25 @@ from shared.event import Event
 import datetime
 import json
 
+class ProductRegistered(Event):
+
+    __sku: str
+
+    def __init__(self, sku: str, timestamp: datetime) -> None:
+        super().__init__('ProductRegistered', timestamp)
+        self.__sku = sku
+    
+    @property
+    def sku(self) -> str:
+        return self.__sku
+    
+    def to_json(self) -> str:
+        return json.dumps({
+            "eventId": str(self.id),
+            "eventType": self.event_type,
+            "data": {}
+        })
+
 class ProductReceived(Event):
 
     __sku: str

@@ -1,4 +1,5 @@
-from events import ProductReceived
+from math import prod
+from events import ProductReceived, ProductRegistered
 from warehouse.product import Product
 from datetime import datetime
 import unittest
@@ -6,7 +7,9 @@ import unittest
 class ProductTest(unittest.TestCase):
 
     def setUp(self):
-        self.product = Product('a')
+        product = Product()
+        product.load([ProductRegistered('a', datetime.utcnow())])
+        self.product = product
     
     def test_receive_increases_quantity(self):
         self.product.receive(1)
