@@ -4,7 +4,6 @@ from warehouse.events.event import Event
 from warehouse.events.inventory_adjusted import InventoryAdjusted
 from warehouse.events.product_received import ProductReceived
 from warehouse.events.product_shipped import ProductShipped
-from warehouse.result import Result
 
 class Product(AggregateRoot):
 
@@ -49,11 +48,9 @@ class Product(AggregateRoot):
         inventory_adjusted = InventoryAdjusted(self._sku, quantity, reason, datetime.utcnow())
         self._add_event(inventory_adjusted)
 
-    def ship(self, quantity: int) -> Result:
+    def ship(self, quantity: int) -> None:
         if(self._quantityOnHand < quantity):
-            return Result.fail('Not enough quantity on hand')
+            raise Exception('Not enough quantity on hand')
 
         product_shipped = ProductShipped(self._sku, quantity, datetime.utcnow())
         self._add_event(product_shipped)
-
-        return Result.ok()

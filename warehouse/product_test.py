@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import final
 import unittest
 from warehouse.events.product_received import ProductReceived
 from warehouse.product import Product
@@ -31,17 +32,10 @@ class ProductTest(unittest.TestCase):
         
         self.assertEqual(4, self.product.quantityOnHand)
     
-    def test_ship_with_enought_quantity_on_hand_succeedes(self):
+    def test_ship_without_enough_quantity_on_hand_raises_exception(self):
         self.product.receive(1)
-        result = self.product.ship(1)
-
-        self.assertTrue(result.success)
-    
-    def test_ship_without_enough_quantity_on_hand_fails(self):
-        self.product.receive(1)
-        result = self.product.ship(2)
-
-        self.assertFalse(result.success)
+        with self.assertRaises(Exception):
+            self.product.ship(2)
 
     def test_receive_rises_event(self):
         self.product.receive(5)
@@ -77,6 +71,10 @@ class ProductTest(unittest.TestCase):
 
     def test_ship_without_enough_quantity_on_hand_doesnt_rise_event(self):
         self.product.load([ProductReceived('a', 6, datetime.utcnow())])
-        self.product.ship(7)
+
+        try:
+            self.product.ship(7)
+        except:
+            pass
 
         self.assertEqual(0, len(self.product.changes))

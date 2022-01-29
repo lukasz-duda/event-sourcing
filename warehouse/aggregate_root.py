@@ -17,7 +17,7 @@ class AggregateRoot:
     def _apply(self, event: Event) -> None:
         pass
 
-    def _add_event(self, event: Event):
+    def _add_event(self, event: Event) -> None:
         self.__changes.append(event)
         self._apply(event)
     
