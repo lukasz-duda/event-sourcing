@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from warehouse.events import ProductReceived, ProductRegistered
 from shared.not_found_exception import NotFoundException
 
@@ -19,12 +19,25 @@ class ProductDto:
     def current_quantity(self):
         return self.__current_quantity
 
+class ProductListDto:
+
+    __sku: str
+
+    def __init__(self, sku: str) -> None:
+        self.__sku = sku
+
+    @property
+    def sku(self):
+        return self.__sku
+
 class FakeDatabase:
 
     __details: Dict[str, ProductDto]
+    __list: List[ProductListDto]
 
     def __init__(self) -> None:
         self.__details = dict()
+        self.__list = []
 
     def save_product(self, details: ProductDto):
         self.__details[details.sku] = details
@@ -34,6 +47,12 @@ class FakeDatabase:
             return self.__details[sku]
         else:
             raise NotFoundException
+    
+    def add_list_item(self, list_item: ProductListDto):
+        self.__list.append(list_item)
+    
+    def get_list(self) -> List[ProductListDto]:
+        return self.__list
         
 class ProductDetailsView:
 
@@ -50,6 +69,17 @@ class ProductDetailsView:
         product = self.__database.get_product(message.sku)
         changed_product = ProductDto(message.sku, product.current_quantity + message.quantity)
         self.__database.save_product(changed_product)
+        
+class ProductListView:
+
+    __database: FakeDatabase
+
+    def __init__(self, database: FakeDatabase) -> None:
+        self.__database = database
+
+    def handle_product_registered(self, message: ProductRegistered) -> None:
+        list_item = ProductListDto(message.sku)
+        self.__database.add_list_item(list_item)
 
 class ReadModelFacade:
 
@@ -60,3 +90,6 @@ class ReadModelFacade:
 
     def get_product(self, sku: str) -> ProductDto:
         return self.__database.get_product(sku)
+
+    def get_products(self) -> List[ProductListDto]:
+        return self.__database.get_list()

@@ -5,7 +5,7 @@ from warehouse.commands import AdjustInventoryCommand, ReceiveProductCommand, Re
 from shared.event_store import EventStore
 from warehouse.events import ProductReceived, ProductRegistered
 from warehouse.product_repository import ProductRepository
-from warehouse.read_model import FakeDatabase, ProductDetailsView, ReadModelFacade
+from warehouse.read_model import FakeDatabase, ProductDetailsView, ProductListView, ReadModelFacade
 from warehouse.commands import ReceiveProductCommand
 from marshmallow import Schema, fields
 from flask_restful import Api, Resource
@@ -23,6 +23,8 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
     details = ProductDetailsView(database)
     bus.register_handler(ProductRegistered, details.handle_product_registered)
     bus.register_handler(ProductReceived, details.handle_product_received)
+    list = ProductListView(database)
+    bus.register_handler(ProductRegistered, list.handle_product_registered)
     read_model = ReadModelFacade(database)
     ServiceLocator.bus = bus
     ServiceLocator.read_model = read_model
@@ -31,10 +33,12 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
     api.add_resource(ReceiveProductResource, '/products/<sku>/receive')
     api.add_resource(ShipProductResource, '/products/<sku>/ship')
     api.add_resource(AdjustInventoryResource, '/products/<sku>/adjust_inventory')
+    api.add_resource(ProductListResource, '/products')
     docs.register(ProductResource)
     docs.register(ReceiveProductResource)
     docs.register(ShipProductResource)
     docs.register(AdjustInventoryResource)
+    docs.register(ProductListResource)
 
 class ProductSchema(Schema):
     sku = fields.String(required=True, description='Product stock-keeping unit')
@@ -47,7 +51,7 @@ class ProductResource(MethodResource, Resource):
     def post(self, sku: str):
         command = RegisterProductCommand(sku)
         ServiceLocator.bus.send(command)
-        return ServiceLocator.read_model.get_product(sku)
+        return ServiceLocator.read_model.get_product(sku), 201, { 'Location': f'/products/{sku}' }
 
     @doc(description='Get product', tags=['Product'])
     @marshal_with(ProductSchema)
@@ -97,3 +101,18 @@ class AdjustInventoryResource(MethodResource, Resource):
         command = AdjustInventoryCommand(sku, quantity, reason)
         ServiceLocator.bus.send(command)
         return ServiceLocator.read_model.get_product(sku)
+
+class ProductListItemSchema(Schema):
+    sku = fields.String(required=True, description='Product stock-keeping unit')
+
+class ProductListSchema(Schema):
+    products = fields.List(fields.Nested(ProductListItemSchema), required=True)
+
+class ProductListResource(MethodResource, Resource):
+
+    @doc(description='Get products', tags=['Product'])
+    @marshal_with(ProductListSchema)
+    def get(self):
+        return {
+            "products": ServiceLocator.read_model.get_products()
+        }
