@@ -1,16 +1,14 @@
-from datetime import datetime
 from shared.fake_bus import FakeBus
 from shared.service_locator import ServiceLocator
 from warehouse.command_handlers import CommandHandlers
-from warehouse.commands import ReceiveProductCommand, RegisterProductCommand
+from warehouse.commands import AdjustInventoryCommand, ReceiveProductCommand, RegisterProductCommand, ShipProductCommand
 from shared.event_store import EventStore
 from warehouse.events import ProductReceived, ProductRegistered
-from shared.not_found_exception import NotFoundException
 from warehouse.product_repository import ProductRepository
-from warehouse.read_model import FakeDatabase, InventoryItemDetailsDto, InventoryItemDetailsView, ReadModelFacade
+from warehouse.read_model import FakeDatabase, ProductDetailsView, ReadModelFacade
 from warehouse.commands import ReceiveProductCommand
 from marshmallow import Schema, fields
-from flask_restful import Api, Resource, abort
+from flask_restful import Api, Resource
 from flask_apispec.views import MethodResource
 from flask_apispec import FlaskApiSpec, marshal_with, doc, use_kwargs
 
@@ -22,7 +20,7 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
     commands = CommandHandlers(repository)
     bus.register_handler(RegisterProductCommand, commands.handle_register_product)
     bus.register_handler(ReceiveProductCommand, commands.handle_receive_product)
-    details = InventoryItemDetailsView(database)
+    details = ProductDetailsView(database)
     bus.register_handler(ProductRegistered, details.handle_product_registered)
     bus.register_handler(ProductReceived, details.handle_product_received)
     read_model = ReadModelFacade(database)
@@ -31,46 +29,71 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
 
     api.add_resource(ProductResource, '/products/<sku>')
     api.add_resource(ReceiveProductResource, '/products/<sku>/receive')
+    api.add_resource(ShipProductResource, '/products/<sku>/ship')
+    api.add_resource(AdjustInventoryResource, '/products/<sku>/adjust_inventory')
     docs.register(ProductResource)
     docs.register(ReceiveProductResource)
+    docs.register(ShipProductResource)
+    docs.register(AdjustInventoryResource)
 
-class ProductResponseSchema(Schema):
-    sku = fields.String(required=True, description="Product stock-keeping unit")
-    current_quantity = fields.Integer(required=True, description="Current quantity", data_key="currentQuantity")
+class ProductSchema(Schema):
+    sku = fields.String(required=True, description='Product stock-keeping unit')
+    current_quantity = fields.Integer(required=True, description='Current quantity', data_key='currentQuantity')
 
 class ProductResource(MethodResource, Resource):
 
     @doc(description='Register product', tags=['Product'])
-    @marshal_with(ProductResponseSchema)
+    @marshal_with(ProductSchema)
     def post(self, sku: str):
-        try:
-            command = RegisterProductCommand(sku)
-            ServiceLocator.bus.send(command)
-            return ServiceLocator.read_model.get_inventory_item_details(sku)
-        except NotFoundException:
-            abort(404)
+        command = RegisterProductCommand(sku)
+        ServiceLocator.bus.send(command)
+        return ServiceLocator.read_model.get_product(sku)
 
     @doc(description='Get product', tags=['Product'])
-    @marshal_with(ProductResponseSchema)
+    @marshal_with(ProductSchema)
     def get(self, sku: str):
-        try:
-            return ServiceLocator.read_model.get_inventory_item_details(sku)
-        except NotFoundException:
-            abort(404)
+        return ServiceLocator.read_model.get_product(sku)
 
-class ReceiveProductRequestSchema(Schema):
-    quantity = fields.Integer(required=True, description="Received quantity")
+class ReceivedProduct(Schema):
+    quantity = fields.Integer(required=True, description='Received quantity')
 
 class ReceiveProductResource(MethodResource, Resource):
 
     @doc(description='Receive product', tags=['Product'])
-    @use_kwargs(ReceiveProductRequestSchema)
-    @marshal_with(ProductResponseSchema)
+    @use_kwargs(ReceivedProduct)
+    @marshal_with(ProductSchema)
     def post(self, sku: str, **kwargs):
         quantity = kwargs['quantity']
         command = ReceiveProductCommand(sku, quantity)
-        try:
-            ServiceLocator.bus.send(command)
-            return ServiceLocator.read_model.get_inventory_item_details(sku)
-        except NotFoundException:
-            abort(404)
+        ServiceLocator.bus.send(command)
+        return ServiceLocator.read_model.get_product(sku)
+
+class ShippedProduct(Schema):
+    quantity = fields.Integer(required=True, description='Shipped quantity')
+
+class ShipProductResource(MethodResource, Resource):
+
+    @doc(description='Ship product', tags=['Product'])
+    @use_kwargs(ShippedProduct)
+    @marshal_with(ProductSchema)
+    def post(self, sku: str, **kwargs):
+        quantity = kwargs['quantity']
+        command = ShipProductCommand(sku, quantity)
+        ServiceLocator.bus.send(command)
+        return ServiceLocator.read_model.get_product(sku)
+
+class InventoryAdjustment(Schema):
+    quantity = fields.Integer(required=True, description='Adjusted quantity')
+    reason = fields.String(required=True, description='Adjustment reason')
+
+class AdjustInventoryResource(MethodResource, Resource):
+
+    @doc(description='Adjust inventory', tags=['Product'])
+    @use_kwargs(InventoryAdjustment)
+    @marshal_with(ProductSchema)
+    def post(self, sku: str, **kwargs):
+        quantity = kwargs['quantity']
+        reason = kwargs['reason']
+        command = AdjustInventoryCommand(sku, quantity, reason)
+        ServiceLocator.bus.send(command)
+        return ServiceLocator.read_model.get_product(sku)
