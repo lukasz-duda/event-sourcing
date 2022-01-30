@@ -1,6 +1,7 @@
+from shared.not_found_exception import NotFoundException
 from warehouse.api import register_warehouse
 from flask import Flask
-from flask_restful import Api
+from flask_restful import Api, abort
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
@@ -18,4 +19,9 @@ def create_app():
     docs = FlaskApiSpec(app)
 
     register_warehouse(api, docs)
+
+    @app.errorhandler(NotFoundException)
+    def handle_not_found_exception(e):
+        abort(404)
+
     return app
