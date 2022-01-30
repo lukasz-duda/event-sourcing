@@ -26,5 +26,5 @@ class CommandHandlers:
 
     def handle_adjust_inventory(self, command: AdjustInventoryCommand) -> None:
         product = self.__repository.get(command.sku)
-        product.adjust_inventory(command.quantity)
+        product.adjust_inventory(command.quantity, command.reason)
         self.__repository.save(product)

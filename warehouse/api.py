@@ -3,7 +3,7 @@ from shared.service_locator import ServiceLocator
 from warehouse.command_handlers import CommandHandlers
 from warehouse.commands import AdjustInventoryCommand, ReceiveProductCommand, RegisterProductCommand, ShipProductCommand
 from shared.event_store import EventStore
-from warehouse.events import ProductReceived, ProductRegistered
+from warehouse.events import InventoryAdjusted, ProductReceived, ProductRegistered, ProductShipped
 from warehouse.product_repository import ProductRepository
 from warehouse.read_model import FakeDatabase, ProductDetailsView, ProductListView, ReadModelFacade
 from warehouse.commands import ReceiveProductCommand
@@ -20,9 +20,13 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
     commands = CommandHandlers(repository)
     bus.register_handler(RegisterProductCommand, commands.handle_register_product)
     bus.register_handler(ReceiveProductCommand, commands.handle_receive_product)
+    bus.register_handler(ShipProductCommand, commands.handle_ship_product)
+    bus.register_handler(AdjustInventoryCommand, commands.handle_adjust_inventory)
     details = ProductDetailsView(database)
     bus.register_handler(ProductRegistered, details.handle_product_registered)
     bus.register_handler(ProductReceived, details.handle_product_received)
+    bus.register_handler(ProductShipped, details.handle_product_shipped)
+    bus.register_handler(InventoryAdjusted, details.handle_inventory_adjusted)
     list = ProductListView(database)
     bus.register_handler(ProductRegistered, list.handle_product_registered)
     read_model = ReadModelFacade(database)

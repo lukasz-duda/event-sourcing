@@ -69,6 +69,16 @@ class ProductDetailsView:
         product = self.__database.get_product(message.sku)
         changed_product = ProductDto(message.sku, product.current_quantity + message.quantity)
         self.__database.save_product(changed_product)
+
+    def handle_product_shipped(self, message: ProductReceived) -> None:
+        product = self.__database.get_product(message.sku)
+        changed_product = ProductDto(message.sku, product.current_quantity - message.quantity)
+        self.__database.save_product(changed_product)
+
+    def handle_inventory_adjusted(self, message: ProductReceived) -> None:
+        product = self.__database.get_product(message.sku)
+        changed_product = ProductDto(message.sku, product.current_quantity + message.quantity)
+        self.__database.save_product(changed_product)
         
 class ProductListView:
 
