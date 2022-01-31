@@ -1,6 +1,5 @@
 from typing import Dict, List
 from warehouse.events import ProductReceived, ProductRegistered
-from shared.not_found_exception import NotFoundException
 
 class ProductDto:
 
@@ -43,10 +42,7 @@ class FakeDatabase:
         self.__details[details.sku] = details
 
     def get_product(self, sku: str) -> ProductDto:
-        if sku in self.__details:
-            return self.__details[sku]
-        else:
-            raise NotFoundException
+        return self.__details[sku]
     
     def add_list_item(self, list_item: ProductListDto):
         self.__list.append(list_item)

@@ -1,7 +1,6 @@
 from typing import Dict, List
 from shared.bus import EventPublisher
 from warehouse.events import Event
-from shared.not_found_exception import NotFoundException
 
 class EventStore:
 
@@ -27,4 +26,10 @@ class EventStore:
         if aggregate_id in self.__streams:
             return self.__streams[aggregate_id]
         else:
-            raise NotFoundException
+            raise AggregateNotFoundException
+
+class AggregateNotFoundException(Exception):
+    pass
+
+class ConcurrencyException(Exception):
+    pass

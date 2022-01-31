@@ -1,4 +1,4 @@
-from shared.not_found_exception import NotFoundException
+from shared.event_store import AggregateNotFoundException
 from warehouse.api import register_warehouse
 from flask import Flask
 from flask_restful import Api, abort
@@ -20,7 +20,7 @@ def create_app():
 
     register_warehouse(api, docs)
 
-    @app.errorhandler(NotFoundException)
+    @app.errorhandler(AggregateNotFoundException)
     def handle_not_found_exception(e):
         abort(404)
 
