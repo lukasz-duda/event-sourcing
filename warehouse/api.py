@@ -36,7 +36,7 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
     api.add_resource(ProductResource, '/products/<sku>')
     api.add_resource(ReceiveProductResource, '/products/<sku>/receive')
     api.add_resource(ShipProductResource, '/products/<sku>/ship')
-    api.add_resource(AdjustInventoryResource, '/products/<sku>/adjust_inventory')
+    api.add_resource(AdjustInventoryResource, '/products/<sku>/adjust-inventory')
     api.add_resource(ProductListResource, '/products')
     docs.register(ProductResource)
     docs.register(ReceiveProductResource)
@@ -47,6 +47,7 @@ def register_warehouse(api: Api, docs: FlaskApiSpec):
 class ProductSchema(Schema):
     sku = fields.String(required=True, description='Product stock-keeping unit')
     current_quantity = fields.Integer(required=True, description='Current quantity', data_key='currentQuantity')
+    version = fields.Integer(required=True, description='Version')
 
 class ProductResource(MethodResource, Resource):
 
@@ -64,6 +65,7 @@ class ProductResource(MethodResource, Resource):
 
 class ReceivedProduct(Schema):
     quantity = fields.Integer(required=True, description='Received quantity')
+    original_version = fields.Integer(required=True, description='Original version', data_key='originalVersion')
 
 class ReceiveProductResource(MethodResource, Resource):
 
@@ -72,12 +74,14 @@ class ReceiveProductResource(MethodResource, Resource):
     @marshal_with(ProductSchema)
     def post(self, sku: str, **kwargs):
         quantity = kwargs['quantity']
-        command = ReceiveProductCommand(sku, quantity)
+        original_version = kwargs['original_version']
+        command = ReceiveProductCommand(sku, quantity, original_version)
         ServiceLocator.bus.send(command)
         return ServiceLocator.read_model.get_product(sku)
 
 class ShippedProduct(Schema):
     quantity = fields.Integer(required=True, description='Shipped quantity')
+    original_version = fields.Integer(required=True, description='Original version', data_key='originalVersion')
 
 class ShipProductResource(MethodResource, Resource):
 
@@ -86,13 +90,15 @@ class ShipProductResource(MethodResource, Resource):
     @marshal_with(ProductSchema)
     def post(self, sku: str, **kwargs):
         quantity = kwargs['quantity']
-        command = ShipProductCommand(sku, quantity)
+        original_version = kwargs['original_version']
+        command = ShipProductCommand(sku, quantity, original_version)
         ServiceLocator.bus.send(command)
         return ServiceLocator.read_model.get_product(sku)
 
 class InventoryAdjustment(Schema):
     quantity = fields.Integer(required=True, description='Adjusted quantity')
     reason = fields.String(required=True, description='Adjustment reason')
+    original_version = fields.Integer(required=True, description='Original version', data_key='originalVersion')
 
 class AdjustInventoryResource(MethodResource, Resource):
 
@@ -102,7 +108,8 @@ class AdjustInventoryResource(MethodResource, Resource):
     def post(self, sku: str, **kwargs):
         quantity = kwargs['quantity']
         reason = kwargs['reason']
-        command = AdjustInventoryCommand(sku, quantity, reason)
+        original_version = kwargs['original_version']
+        command = AdjustInventoryCommand(sku, quantity, reason, original_version)
         ServiceLocator.bus.send(command)
         return ServiceLocator.read_model.get_product(sku)
 

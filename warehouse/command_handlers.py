@@ -1,4 +1,4 @@
-from warehouse.commands import AdjustInventoryCommand, ReceiveProductCommand, RegisterProductCommand, ShipProductCommand
+from warehouse.commands import AdjustInventoryCommand, ReceiveProductCommand, RegisterProductCommand, ShipProductCommand, UnregisterProduct
 from warehouse.product import Product
 from warehouse.product_repository import ProductRepository
 
@@ -12,19 +12,19 @@ class CommandHandlers:
     def handle_register_product(self, command: RegisterProductCommand) -> None:
         newProduct = Product()
         newProduct.register(command.sku)
-        self.__repository.save(newProduct)
+        self.__repository.save(newProduct, -1)
 
     def handle_receive_product(self, command: ReceiveProductCommand) -> None:
         product = self.__repository.get(command.sku)
         product.receive(command.quantity)
-        self.__repository.save(product)
+        self.__repository.save(product, command.original_version)
 
     def handle_ship_product(self, command: ShipProductCommand) -> None:
         product = self.__repository.get(command.sku)
         product.ship(command.quantity)
-        self.__repository.save(product)
+        self.__repository.save(product, command.original_version)
 
     def handle_adjust_inventory(self, command: AdjustInventoryCommand) -> None:
         product = self.__repository.get(command.sku)
         product.adjust_inventory(command.quantity, command.reason)
-        self.__repository.save(product)
+        self.__repository.save(product, command.original_version)

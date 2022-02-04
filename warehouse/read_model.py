@@ -1,3 +1,4 @@
+from curses.panel import version
 from typing import Dict, List
 from warehouse.events import ProductReceived, ProductRegistered
 
@@ -5,10 +6,12 @@ class ProductDto:
 
     __sku: str
     __current_quantity: int
+    __version: int
 
-    def __init__(self, sku: str, current_quantity: int) -> None:
+    def __init__(self, sku: str, current_quantity: int, version: int) -> None:
         self.__sku = sku
         self.__current_quantity = current_quantity
+        self.__version = version
 
     @property
     def sku(self):
@@ -17,6 +20,10 @@ class ProductDto:
     @property
     def current_quantity(self):
         return self.__current_quantity
+
+    @property
+    def version(self):
+        return self.__version
 
 class ProductListDto:
 
@@ -58,22 +65,22 @@ class ProductDetailsView:
         self.__database = database
 
     def handle_product_registered(self, message: ProductRegistered) -> None:
-        new_product = ProductDto(sku=message.sku, current_quantity=0)
+        new_product = ProductDto(sku=message.sku, current_quantity=0, version=message.version)
         self.__database.save_product(new_product)
 
     def handle_product_received(self, message: ProductReceived) -> None:
         product = self.__database.get_product(message.sku)
-        changed_product = ProductDto(message.sku, product.current_quantity + message.quantity)
+        changed_product = ProductDto(message.sku, product.current_quantity + message.quantity, version=message.version)
         self.__database.save_product(changed_product)
 
     def handle_product_shipped(self, message: ProductReceived) -> None:
         product = self.__database.get_product(message.sku)
-        changed_product = ProductDto(message.sku, product.current_quantity - message.quantity)
+        changed_product = ProductDto(message.sku, product.current_quantity - message.quantity, version=message.version)
         self.__database.save_product(changed_product)
 
     def handle_inventory_adjusted(self, message: ProductReceived) -> None:
         product = self.__database.get_product(message.sku)
-        changed_product = ProductDto(message.sku, product.current_quantity + message.quantity)
+        changed_product = ProductDto(message.sku, product.current_quantity + message.quantity, version=message.version)
         self.__database.save_product(changed_product)
         
 class ProductListView:

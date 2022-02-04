@@ -1,4 +1,4 @@
-from shared.event_store import AggregateNotFoundException
+from shared.event_store import AggregateNotFoundException, ConcurrencyException
 from warehouse.api import register_warehouse
 from flask import Flask
 from flask_restful import Api, abort
@@ -21,7 +21,11 @@ def create_app():
     register_warehouse(api, docs)
 
     @app.errorhandler(AggregateNotFoundException)
-    def handle_not_found_exception(e):
+    def handle_aggregate_not_found_exception(e):
         abort(404)
+
+    @app.errorhandler(ConcurrencyException)
+    def handle_concurrency_exception(e):
+        abort(409)
 
     return app

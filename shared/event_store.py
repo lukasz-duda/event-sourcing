@@ -11,15 +11,21 @@ class EventStore:
         self.__publisher =  event_publisher
         self.__streams = dict()
     
-    def save_events(self, aggregate_id: str, events: List[Event]):
-        if aggregate_id in self.__streams:
-            stream_events = self.__streams[aggregate_id]
-            for new_event in events:
-                stream_events.append(new_event)
-        else:
-            self.__streams[aggregate_id] = events
+    def save_events(self, aggregate_id: str, events: List[Event], expected_version: int):
+        if aggregate_id not in self.__streams:
+            self.__streams[aggregate_id] = []
 
+        event_stream = self.__streams[aggregate_id]
+
+        length = len(event_stream)
+        if length > 0 and event_stream[length - 1].version != expected_version:
+            raise ConcurrencyException
+
+        version = expected_version
         for event in events:
+            version += 1
+            event.version = version
+            event_stream.append(event)
             self.__publisher.publish(event)
     
     def get_events_for_aggregate(self, aggregate_id: str) -> List[Event]:
